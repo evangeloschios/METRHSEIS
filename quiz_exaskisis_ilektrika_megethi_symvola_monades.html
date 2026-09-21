@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz εξάσκησης – Ηλεκτρικά μεγέθη, σύμβολα και μονάδες</title>
+<style>
+:root{
+  --ink:#17324d; --muted:#617487; --blue:#176fb5; --deep:#0b4e87;
+  --teal:#118d88; --pale:#eef7ff; --line:#cbddeb; --card:#fff;
+  --ok:#198754; --bad:#c43d3d; --warn:#b36b00;
+  --shadow:0 10px 28px rgba(24,63,96,.13);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; min-height:100vh; color:var(--ink);
+  font-family:Arial,"Segoe UI",sans-serif;
+  background:linear-gradient(135deg,#eef8ff 0%,#fbfdff 50%,#effaf7 100%);
+}
+header{
+  color:#fff; padding:28px 18px 24px;
+  background:linear-gradient(115deg,var(--deep),var(--blue) 58%,var(--teal));
+  box-shadow:0 5px 18px rgba(0,53,97,.22);
+}
+.header-inner{
+  max-width:1150px; margin:auto; display:flex; justify-content:space-between;
+  align-items:flex-start; gap:20px; flex-wrap:wrap;
+}
+h1{margin:0 0 7px;font-size:clamp(1.55rem,3vw,2.35rem);line-height:1.15}
+.subtitle{margin:0;opacity:.95;font-size:1.02rem}
+.author{border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.15);border-radius:999px;padding:9px 15px;font-weight:800}
+main{max-width:1150px;margin:22px auto 44px;padding:0 14px}
+.intro,.activity{background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+.intro{padding:17px 19px;margin-bottom:18px;line-height:1.55}
+.intro strong{color:var(--deep)}
+.tip{margin-top:9px;color:var(--muted);font-size:.93rem}
+.activity{padding:18px}
+.banks{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:18px}
+.bank{
+  min-height:112px; border:2px dashed #91b7d4; border-radius:16px;
+  background:#f4f9fd; padding:13px;
+}
+.bank h2{font-size:1rem;margin:0 0 10px;color:var(--deep)}
+.bank-cards{display:flex;flex-wrap:wrap;gap:9px;min-height:55px;align-content:flex-start}
+.drag-card{
+  border:2px solid #85afce; border-radius:12px; background:white;
+  padding:10px 14px; min-width:62px; text-align:center; font-weight:800;
+  font-size:1rem; box-shadow:0 3px 9px rgba(25,72,110,.11);
+  cursor:grab; user-select:none; touch-action:none;
+  transition:transform .14s,border-color .14s,box-shadow .14s;
+}
+.drag-card:hover{transform:translateY(-1px);box-shadow:0 6px 13px rgba(25,72,110,.16)}
+.drag-card:active{cursor:grabbing}
+.drag-card.selected{border-color:#f0a000;box-shadow:0 0 0 4px rgba(240,160,0,.18)}
+.drag-card.dragging{opacity:.4}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px}
+.quiz-table{width:100%;border-collapse:separate;border-spacing:0;min-width:720px;background:white}
+.quiz-table th{
+  padding:14px 12px; color:white; font-size:1.02rem; text-align:center;
+  background:linear-gradient(115deg,var(--deep),var(--blue));
+}
+.quiz-table th:first-child{border-top-left-radius:14px}
+.quiz-table th:last-child{border-top-right-radius:14px}
+.quiz-table td{padding:12px;border-top:1px solid #dce8f1;vertical-align:middle}
+.quiz-table tbody tr:first-child td{border-top:0}
+.quiz-table tbody tr:nth-child(even){background:#f9fcff}
+.quantity{
+  font-weight:800; color:var(--deep); text-align:left; font-size:1rem;
+  border-left:5px solid #65a7d2;
+}
+.dropzone{
+  min-height:60px; border:2px dashed #8aacC8; border-radius:12px;
+  background:#eff7fc; padding:7px; display:flex; align-items:center;
+  justify-content:center; cursor:pointer; transition:.16s;
+}
+.dropzone.dragover,.dropzone:focus{outline:none;border-color:var(--blue);background:#e2f2ff}
+.dropzone .drag-card{width:100%;cursor:pointer}
+.placeholder{color:#6e8294;font-size:.88rem;text-align:center}
+tr.correct-row td{background:#effbf4}
+tr.correct-row .dropzone{border-color:var(--ok);background:#ecfbf3}
+tr.incorrect-row td{background:#fff5f5}
+tr.incorrect-row .dropzone{border-color:var(--bad);background:#fff0f0}
+tr.empty-row td{background:#fffaf0}
+tr.empty-row .dropzone{border-color:var(--warn);background:#fff8eb}
+.controls{
+  margin-top:18px; display:flex; justify-content:center; align-items:center;
+  gap:10px; flex-wrap:wrap; position:sticky; bottom:8px; z-index:5;
+  background:rgba(255,255,255,.94); backdrop-filter:blur(8px);
+  border:1px solid var(--line); border-radius:16px; padding:13px;
+  box-shadow:0 -4px 20px rgba(25,63,96,.12)
+}
+button{border:0;border-radius:12px;padding:12px 17px;font:800 1rem Arial,"Segoe UI",sans-serif;cursor:pointer}
+.primary{color:white;background:linear-gradient(135deg,var(--blue),var(--teal))}
+.secondary{color:var(--deep);background:#e9f3fa;border:1px solid #bad3e6}
+button:hover{filter:brightness(1.03)}
+.feedback{
+  min-width:290px; max-width:100%; text-align:center; font-weight:800;
+  padding:10px 13px; border-radius:11px; background:#f2f7fa;
+}
+.feedback.ok{color:var(--ok);background:#eaf9f0}
+.feedback.bad{color:#8c2e2e;background:#fff0f0}
+.feedback.warn{color:#865400;background:#fff6e7}
+footer{text-align:center;color:#687a8b;padding:4px 15px 28px;font-size:.9rem}
+@media(max-width:700px){
+  .banks{grid-template-columns:1fr}.activity{padding:12px}.controls{position:relative;bottom:auto}
+  .drag-card{font-size:.96rem}.header-inner{gap:12px}
+}
+@media print{body{background:white}.banks,.controls{display:none}.activity,.intro{box-shadow:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div>
+      <h1>Ηλεκτρικά Μεγέθη – Σύμβολα – Μονάδες</h1>
+      <p class="subtitle">Quiz εξάσκησης με αντιστοίχιση drag and drop</p>
+    </div>
+    <div class="author">Ε. Κοκκώδης</div>
+  </div>
+</header>
+
+<main>
+  <section class="intro">
+    <strong>Οδηγίες:</strong> Σύρε κάθε σύμβολο και κάθε μονάδα στη σωστή γραμμή του ηλεκτρικού μεγέθους.
+    Σε οθόνη αφής μπορείς να πατήσεις πρώτα μια κάρτα και έπειτα τη θέση όπου θέλεις να την τοποθετήσεις.
+    <div class="tip">Πρόκειται για εξάσκηση: δεν υπάρχει βαθμός και μπορείς να δοκιμάσεις όσες φορές θέλεις.</div>
+  </section>
+
+  <section class="activity">
+    <div class="banks">
+      <div class="bank">
+        <h2>Κάρτες συμβόλων</h2>
+        <div class="bank-cards" id="symbolBank" data-type="symbol"></div>
+      </div>
+      <div class="bank">
+        <h2>Κάρτες μονάδων</h2>
+        <div class="bank-cards" id="unitBank" data-type="unit"></div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="quiz-table" aria-label="Αντιστοίχιση ηλεκτρικών μεγεθών, συμβόλων και μονάδων">
+        <thead>
+          <tr>
+            <th>Ηλεκτρικό μέγεθος</th>
+            <th>Σύμβολο</th>
+            <th>Μονάδα</th>
+          </tr>
+        </thead>
+        <tbody id="quizBody"></tbody>
+      </table>
+    </div>
+
+    <div class="controls">
+      <button class="primary" id="checkBtn" type="button">Έλεγχος απαντήσεων</button>
+      <button class="secondary" id="resetBtn" type="button">Νέα προσπάθεια</button>
+      <div class="feedback" id="feedback" aria-live="polite">Τοποθέτησε όλες τις κάρτες στις σωστές θέσεις.</div>
+    </div>
+  </section>
+</main>
+<footer>Quiz εξάσκησης – Ηλεκτρικά μεγέθη, σύμβολα και μονάδες</footer>
+
+<script>
+(() => {
+  const items = [
+    {id:'voltage', quantity:'Ηλεκτρική Τάση', symbol:'U', unit:'Volt'},
+    {id:'current', quantity:'Ένταση Ηλεκτρικού Ρεύματος', symbol:'Ι', unit:'Ampere'},
+    {id:'resistance', quantity:'Αντίσταση', symbol:'R', unit:'Ωμ'},
+    {id:'power', quantity:'Ισχύς', symbol:'P', unit:'Watt'},
+    {id:'energy', quantity:'Ενέργεια', symbol:'Ε', unit:'KWh'}
+  ];
+
+  const symbolBank = document.getElementById('symbolBank');
+  const unitBank = document.getElementById('unitBank');
+  const quizBody = document.getElementById('quizBody');
+  const feedback = document.getElementById('feedback');
+  let selectedCard = null;
+
+  const shuffle = arr => {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  };
+
+  function createCard(type, item) {
+    const card = document.createElement('div');
+    card.className = 'drag-card';
+    card.draggable = true;
+    card.tabIndex = 0;
+    card.dataset.type = type;
+    card.dataset.value = item[type];
+    card.textContent = item[type];
+    card.setAttribute('aria-label', `${type === 'symbol' ? 'Σύμβολο' : 'Μονάδα'} ${item[type]}`);
+
+    card.addEventListener('dragstart', e => {
+      selectedCard = card;
+      card.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', card.dataset.value);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    card.addEventListener('click', e => {
+      e.stopPropagation();
+      selectCard(card);
+    });
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        selectCard(card);
+      }
+    });
+    return card;
+  }
+
+  function selectCard(card) {
+    document.querySelectorAll('.drag-card.selected').forEach(c => c.classList.remove('selected'));
+    if (selectedCard === card) {
+      selectedCard = null;
+      return;
+    }
+    selectedCard = card;
+    card.classList.add('selected');
+  }
+
+  function returnCardToBank(card) {
+    const bank = card.dataset.type === 'symbol' ? symbolBank : unitBank;
+    bank.appendChild(card);
+    card.classList.remove('selected');
+    selectedCard = null;
+  }
+
+  function placeCard(zone, card) {
+    if (!card || card.dataset.type !== zone.dataset.type) {
+      feedback.className = 'feedback warn';
+      feedback.textContent = zone.dataset.type === 'symbol'
+        ? 'Σε αυτή τη στήλη τοποθετούνται μόνο σύμβολα.'
+        : 'Σε αυτή τη στήλη τοποθετούνται μόνο μονάδες.';
+      return;
+    }
+    const existing = zone.querySelector('.drag-card');
+    if (existing && existing !== card) returnCardToBank(existing);
+    zone.innerHTML = '';
+    zone.appendChild(card);
+    card.classList.remove('selected');
+    selectedCard = null;
+    clearRowState(zone.closest('tr'));
+    feedback.className = 'feedback';
+    feedback.textContent = 'Συνέχισε μέχρι να συμπληρωθούν όλες οι θέσεις.';
+  }
+
+  function makeDropzone(type, answer) {
+    const zone = document.createElement('div');
+    zone.className = 'dropzone';
+    zone.tabIndex = 0;
+    zone.dataset.type = type;
+    zone.dataset.answer = answer;
+    zone.innerHTML = `<span class="placeholder">Τοποθέτησε ${type === 'symbol' ? 'το σύμβολο' : 'τη μονάδα'}</span>`;
+
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault(); zone.classList.remove('dragover');
+      placeCard(zone, selectedCard);
+    });
+    zone.addEventListener('click', () => {
+      if (selectedCard) placeCard(zone, selectedCard);
+      else {
+        const card = zone.querySelector('.drag-card');
+        if (card) returnCardToBank(card);
+      }
+    });
+    zone.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (selectedCard) placeCard(zone, selectedCard);
+      }
+    });
+    return zone;
+  }
+
+  function clearRowState(row) {
+    row.classList.remove('correct-row','incorrect-row','empty-row');
+  }
+
+  function buildQuiz() {
+    quizBody.innerHTML = '';
+    symbolBank.innerHTML = '';
+    unitBank.innerHTML = '';
+    selectedCard = null;
+
+    items.forEach(item => {
+      const row = document.createElement('tr');
+      row.dataset.id = item.id;
+      const q = document.createElement('td');
+      q.className = 'quantity';
+      q.textContent = item.quantity;
+      const s = document.createElement('td');
+      s.appendChild(makeDropzone('symbol', item.symbol));
+      const u = document.createElement('td');
+      u.appendChild(makeDropzone('unit', item.unit));
+      row.append(q,s,u);
+      quizBody.appendChild(row);
+    });
+
+    shuffle(items).forEach(item => symbolBank.appendChild(createCard('symbol', item)));
+    shuffle(items).forEach(item => unitBank.appendChild(createCard('unit', item)));
+
+    feedback.className = 'feedback';
+    feedback.textContent = 'Τοποθέτησε όλες τις κάρτες στις σωστές θέσεις.';
+  }
+
+  function checkAnswers() {
+    let allFilled = true;
+    let allCorrect = true;
+
+    document.querySelectorAll('#quizBody tr').forEach(row => {
+      clearRowState(row);
+      const zones = [...row.querySelectorAll('.dropzone')];
+      const missing = zones.some(z => !z.querySelector('.drag-card'));
+      if (missing) {
+        row.classList.add('empty-row');
+        allFilled = false;
+        allCorrect = false;
+        return;
+      }
+      const correct = zones.every(z => z.querySelector('.drag-card').dataset.value === z.dataset.answer);
+      row.classList.add(correct ? 'correct-row' : 'incorrect-row');
+      if (!correct) allCorrect = false;
+    });
+
+    if (!allFilled) {
+      feedback.className = 'feedback warn';
+      feedback.textContent = 'Υπάρχουν κενές θέσεις. Συμπλήρωσέ τες και ξαναπάτησε «Έλεγχος απαντήσεων».';
+    } else if (allCorrect) {
+      feedback.className = 'feedback ok';
+      feedback.textContent = 'Μπράβο! Όλες οι αντιστοιχίσεις είναι σωστές.';
+    } else {
+      feedback.className = 'feedback bad';
+      feedback.textContent = 'Κάποιες αντιστοιχίσεις χρειάζονται διόρθωση. Δοκίμασε ξανά χωρίς κανέναν περιορισμό.';
+    }
+  }
+
+  document.getElementById('checkBtn').addEventListener('click', checkAnswers);
+  document.getElementById('resetBtn').addEventListener('click', buildQuiz);
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.drag-card') && !e.target.closest('.dropzone')) {
+      document.querySelectorAll('.drag-card.selected').forEach(c => c.classList.remove('selected'));
+      selectedCard = null;
+    }
+  });
+
+  buildQuiz();
+})();
+</script>
+</body>
+</html>
